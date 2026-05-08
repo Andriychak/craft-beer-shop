@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Крафтове пиво - Інтернет-магазин</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">🍺 Craft Beer Shop</div>
+      <ul class="nav-menu">
+        <li><a href="#" class="nav-link" onclick="showPage('products')">Каталог</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('create')">Додати товар</a></li>
+        <li><a href="#" class="nav-link cart-link" onclick="showPage('cart')">
+          Корзина <span id="cartCount" class="cart-count">0</span>
+        </a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Products Page -->
+    <div id="products-page" class="page active">
+      <h1>Каталог пива</h1>
+      
+      <!-- Search and Sort -->
+      <div class="controls">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Пошук за назвою, описом, пивоварнею...">
+          <button onclick="searchProducts()" class="btn btn-primary">Пошук</button>
+        </div>
+        
+        <div class="sort-box">
+          <label for="sortSelect">Сортування:</label>
+          <select id="sortSelect" onchange="sortProducts()">
+            <option value="name">За назвою (A-Z)</option>
+            <option value="price">За ціною (зростання)</option>
+            <option value="alcohol">За крепкістю (зростання)</option>
+            <option value="created_at">За датою додавання</option>
+          </select>
+        </div>
+
+        <div class="sort-box">
+          <label for="categoryFilter">Категорія:</label>
+          <select id="categoryFilter" onchange="filterCategory()">
+            <option value="all">Всі категорії</option>
+            <option value="Світле">Світле</option>
+            <option value="Темне">Темне</option>
+            <option value="Лагер">Лагер</option>
+            <option value="IPA">IPA</option>
+            <option value="Портер">Портер</option>
+            <option value="Пшеничне">Пшеничне</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div id="productsContainer" class="products-grid">
+        <!-- Products will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Create Product Page -->
+    <div id="create-page" class="page">
+      <h1>Додати новий товар</h1>
+      <form id="createForm" class="product-form" onsubmit="handleCreateProduct(event)">
+        <div class="form-group">
+          <label for="createName">Назва пива:</label>
+          <input type="text" id="createName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="createBrew">Пивоварня:</label>
+          <input type="text" id="createBrew">
+        </div>
+
+        <div class="form-group">
+          <label for="createPrice">Ціна (грн):</label>
+          <input type="number" id="createPrice" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="createAlcohol">Крепкість (%):</label>
+          <input type="number" id="createAlcohol" step="0.1" min="0" max="20">
+        </div>
+
+        <div class="form-group">
+          <label for="createVolume">Об'єм (мл):</label>
+          <input type="number" id="createVolume" step="1" min="100">
+        </div>
+
+        <div class="form-group">
+          <label for="createCategory">Категорія:</label>
+          <select id="createCategory">
+            <option value="Світле">Світле</option>
+            <option value="Темне">Темне</option>
+            <option value="Лагер">Лагер</option>
+            <option value="IPA">IPA</option>
+            <option value="Портер">Портер</option>
+            <option value="Пшеничне">Пшеничне</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="createImage">Посилання на зображення:</label>
+          <input type="url" id="createImage" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="createDescription">Опис:</label>
+          <textarea id="createDescription" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success">Додати товар</button>
+          <button type="button" class="btn btn-secondary" onclick="showPage('products')">Скасувати</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Edit Product Page -->
+    <div id="edit-page" class="page">
+      <h1>Редагування товару</h1>
+      <form id="editForm" class="product-form" onsubmit="handleEditProduct(event)">
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+          <label for="editName">Назва пива:</label>
+          <input type="text" id="editName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editBrew">Пивоварня:</label>
+          <input type="text" id="editBrew">
+        </div>
+
+        <div class="form-group">
+          <label for="editPrice">Ціна (грн):</label>
+          <input type="number" id="editPrice" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editAlcohol">Крепкість (%):</label>
+          <input type="number" id="editAlcohol" step="0.1" min="0" max="20">
+        </div>
+
+        <div class="form-group">
+          <label for="editVolume">Об'єм (мл):</label>
+          <input type="number" id="editVolume" step="1" min="100">
+        </div>
+
+        <div class="form-group">
+          <label for="editCategory">Категорія:</label>
+          <select id="editCategory">
+            <option value="Світле">Світле</option>
+            <option value="Темне">Темне</option>
+            <option value="Лагер">Лагер</option>
+            <option value="IPA">IPA</option>
+            <option value="Портер">Портер</option>
+            <option value="Пшеничне">Пшеничне</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editImage">Посилання на зображення:</label>
+          <input type="url" id="editImage" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Опис:</label>
+          <textarea id="editDescription" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success">Зберегти зміни</button>
+          <button type="button" class="btn btn-secondary" onclick="showPage('products')">Скасувати</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Cart Page -->
+    <div id="cart-page" class="page">
+      <h1>Корзина</h1>
+      <div id="cartContainer" class="cart-container">
+        <!-- Cart items will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for confirmation -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Підтвердження</h2>
+      <p id="modalMessage"></p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="confirmAction()">Так, видалити</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Скасувати</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
