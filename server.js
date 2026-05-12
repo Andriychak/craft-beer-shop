@@ -3,9 +3,11 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 
 const app = express();
 const PORT = 3000;
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Middleware
 app.use(cors());
@@ -265,8 +267,15 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // Create product
-app.post('/api/products', (req, res) => {
-  const { name, description, price, alcohol, volume, brewery, category, image } = req.body;
+app.post('/api/products', upload.single('imageFile'), (req, res) => {
+  const { name, description, price, alcohol, volume, brewery, category } = req.body;
+  let image = req.body.image || '';
+
+  if (req.file) {
+    const mimeType = req.file.mimetype;
+    const base64Data = req.file.buffer.toString('base64');
+    image = `data:${mimeType};base64,${base64Data}`;
+  }
 
   if (!name || price === undefined) {
     return res.status(400).json({ error: 'Name and price are required' });
@@ -287,29 +296,51 @@ app.post('/api/products', (req, res) => {
 });
 
 // Update product
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', upload.single('imageFile'), (req, res) => {
+  console.log('PUT /api/products/:id called with:', req.params.id, req.body, req.file ? 'has file' : 'no file');
   const { id } = req.params;
   const { name, description, price, alcohol, volume, brewery, category, image } = req.body;
+  let imageData = image;
+
+  if (req.file) {
+    const mimeType = req.file.mimetype;
+    const base64Data = req.file.buffer.toString('base64');
+    imageData = `data:${mimeType};base64,${base64Data}`;
+  }
 
   if (!name || price === undefined) {
     return res.status(400).json({ error: 'Name and price are required' });
   }
 
-  db.run(
-    `UPDATE products SET name = ?, description = ?, price = ?, alcohol = ?, volume = ?, brewery = ?, category = ?, image = ?
-     WHERE id = ?`,
-    [name, description, price, alcohol, volume, brewery, category, image, id],
-    function(err) {
-      if (err) {
-        console.error('Error updating product:', err);
-        return res.status(500).json({ error: 'Failed to update product' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      res.json({ message: 'Product updated successfully' });
+  db.get('SELECT image FROM products WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      console.error('Error fetching current image:', err);
+      return res.status(500).json({ error: 'Failed to fetch current product image' });
     }
-  );
+    if (!row) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (!req.file && imageData === undefined) {
+      imageData = row.image;
+    }
+
+    db.run(
+      `UPDATE products SET name = ?, description = ?, price = ?, alcohol = ?, volume = ?, brewery = ?, category = ?, image = ?
+       WHERE id = ?`,
+      [name, description, price, alcohol, volume, brewery, category, imageData, id],
+      function(err) {
+        if (err) {
+          console.error('Error updating product:', err);
+          return res.status(500).json({ error: 'Failed to update product' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json({ message: 'Product updated successfully' });
+      }
+    );
+  });
 });
 
 // Delete product
