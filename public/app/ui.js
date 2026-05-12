@@ -1,5 +1,8 @@
 // ===== UI Manager Class =====
 class UIManager {
+
+  noImageUrl = '../img/beer.webp';
+
   constructor() {
     this.currentPage = 'products';
   }
@@ -19,7 +22,7 @@ class UIManager {
   }
 
   renderProductCard(product) {
-    const imageUrl = product.image || '';
+    const imageUrl = product.image || this.noImageUrl;
     const imageContent = imageUrl
       ? `<img src="${imageUrl}" alt="${product.name}">`
       : `<div class="product-image-placeholder">🍺</div>`;
@@ -38,7 +41,7 @@ class UIManager {
           
           <div class="product-info">
             <div class="info-item">
-              <span class="info-label">Крепкість:</span>
+              <span class="info-label">Міцність:</span>
               <span class="info-value">${product.alcohol}%</span>
             </div>
             <div class="info-item">
@@ -74,7 +77,7 @@ class UIManager {
   }
 
   renderCartItem(cartItem) {
-    const imageUrl = cartItem.image || '';
+    const imageUrl = cartItem.image || this.noImageUrl;
     const imageContent = imageUrl
       ? `<img src="${imageUrl}" alt="${cartItem.name}">`
       : `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 2rem;">🍺</div>`;
@@ -137,7 +140,7 @@ class UIManager {
         </div>
       </div>
       <div class="cart-actions">
-        <button class="btn btn-success">Оформити замовлення</button>
+        <button class="btn btn-success" onclick="app.handlePlaceOrder()">Оформити замовлення</button>
         <button class="btn btn-danger" onclick="app.handleClearCart()">Очистити корзину</button>
       </div>
     `;
@@ -191,8 +194,45 @@ class UIManager {
   }
 
   showNotification(message, type = 'success') {
-    // Simple notification using alert - can be enhanced with a toast component
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+      console.error('Toast container not found!');
+      return;
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    // Icon based on type
+    const icons = {
+      success: '✓',
+      error: '✕',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+
+    toast.innerHTML = `
+      <span class="toast-icon">${icons[type] || 'ℹ'}</span>
+      <span class="toast-message">${this.escapeHtml(message)}</span>
+      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    // Add to container
+    container.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 300); // Wait for animation to finish
+    }, 5000);
   }
 
   escapeHtml(text) {

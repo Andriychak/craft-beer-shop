@@ -26,6 +26,15 @@ craft-beer-shop/
 ├── package.json           # Залежності проекту
 ├── beer_shop.db          # SQLite база даних (автоматично)
 ├── public/
+|   |── app/
+|   |   |── apiservice.js
+|   |   |── app.js
+|   |   |── cart.js
+|   |   |── cartService.js
+|   |   |── modal.js
+|   |   |── product.js
+|   |   |── productService.js
+|   |   |── ui.js
 │   ├── index.html        # HTML структура
 │   ├── styles.css        # CSS стилі (dark theme, responsive)
 │   └── app.js            # JavaScript (ООП: класи, інкапсуляція)

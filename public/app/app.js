@@ -96,6 +96,10 @@ class App {
   async handleClearCart() {
     return this.cartService.handleClearCart();
   }
+
+  async handlePlaceOrder() {
+    return this.cartService.handlePlaceOrder();
+  }
 }
 
 // ===== Initialize App =====

@@ -57,7 +57,7 @@ class ProductService {
 
     try {
       await this.api.createProduct(productData);
-      this.ui.showNotification('Товар успішно додан!', 'success');
+      this.ui.showNotification('Товар успішно доданий!', 'success');
       this.ui.clearProductForm(false);
       this.ui.showPage('products');
       await this.loadProducts();
@@ -94,7 +94,7 @@ class ProductService {
 
     try {
       await this.api.updateProduct(productId, productData);
-      this.ui.showNotification('Товар успішно оновлен!', 'success');
+      this.ui.showNotification('Товар успішно оновлено!', 'success');
       this.ui.clearProductForm(true);
       this.ui.showPage('products');
       await this.loadProducts();
@@ -107,7 +107,7 @@ class ProductService {
   handleDeleteProductClick(productId) {
     this.ui.showModal(
       'Видалення товару',
-      'Ви впевнені, що хочете видалити цей товар? Дія необоротна.',
+      'Ви впевнені, що хочете видалити цей товар? Дія незворотна.',
       () => this.confirmDeleteProduct(productId)
     );
   }
@@ -116,7 +116,7 @@ class ProductService {
     try {
       await this.api.deleteProduct(productId);
       this.ui.closeModal();
-      this.ui.showNotification('Товар успішно видален!', 'success');
+      this.ui.showNotification('Товар успішно видалений!', 'success');
       await this.loadProducts();
     } catch (error) {
       console.error('Error deleting product:', error);

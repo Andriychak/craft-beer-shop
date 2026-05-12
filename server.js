@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5300;
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Middleware
@@ -56,6 +56,29 @@ function initDatabase() {
     )
   `, (err) => {
     if (err) console.error('Error creating cart table:', err);
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) console.error('Error creating orders table:', err);
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      product_id INTEGER NOT NULL,
+      quantity INTEGER NOT NULL,
+      price REAL NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+    if (err) console.error('Error creating order_items table:', err);
   });
 }
 
@@ -440,6 +463,73 @@ app.delete('/api/cart', (req, res) => {
       return res.status(500).json({ error: 'Failed to clear cart' });
     }
     res.json({ message: 'Cart cleared successfully' });
+  });
+});
+
+// Place order
+app.post('/api/orders', (req, res) => {
+  const cartQuery = `
+    SELECT c.product_id, p.price, c.quantity
+    FROM cart c
+    JOIN products p ON c.product_id = p.id
+  `;
+
+  db.all(cartQuery, (err, cartItems) => {
+    if (err) {
+      console.error('Error fetching cart for order:', err);
+      return res.status(500).json({ error: 'Failed to place order' });
+    }
+
+    if (!cartItems.length) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      db.run('INSERT INTO orders DEFAULT VALUES', function(err) {
+        if (err) {
+          console.error('Error creating order:', err);
+          db.run('ROLLBACK');
+          return res.status(500).json({ error: 'Failed to place order' });
+        }
+
+        const orderId = this.lastID;
+        const stmt = db.prepare(
+          'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)'
+        );
+
+        cartItems.forEach((item) => {
+          stmt.run(orderId, item.product_id, item.quantity, item.price);
+        });
+
+        stmt.finalize((stmtErr) => {
+          if (stmtErr) {
+            console.error('Error saving order items:', stmtErr);
+            db.run('ROLLBACK');
+            return res.status(500).json({ error: 'Failed to place order' });
+          }
+
+          db.run('DELETE FROM cart', function(deleteErr) {
+            if (deleteErr) {
+              console.error('Error clearing cart after order:', deleteErr);
+              db.run('ROLLBACK');
+              return res.status(500).json({ error: 'Failed to place order' });
+            }
+
+            db.run('COMMIT', (commitErr) => {
+              if (commitErr) {
+                console.error('Error committing order transaction:', commitErr);
+                db.run('ROLLBACK');
+                return res.status(500).json({ error: 'Failed to place order' });
+              }
+
+              res.json({ message: 'Order placed successfully', orderId });
+            });
+          });
+        });
+      });
+    });
   });
 });
 

@@ -24,7 +24,7 @@ class CartService {
   async handleAddToCart(productId) {
     try {
       await this.api.addToCart(productId, 1);
-      this.ui.showNotification('Товар додан в корзину!', 'success');
+      this.ui.showNotification('Товар успішно доданий в корзину!', 'success');
       await this.loadCart();
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -35,7 +35,7 @@ class CartService {
   async handleRemoveFromCart(cartItemId) {
     try {
       await this.api.removeFromCart(cartItemId);
-      this.ui.showNotification('Товар видален з корзини', 'success');
+      this.ui.showNotification('Товар успішно видалений з корзини!', 'success');
       await this.loadCart();
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -67,11 +67,29 @@ class CartService {
         try {
           await this.api.clearCart();
           this.ui.closeModal();
-          this.ui.showNotification('Корзина очищена', 'success');
+          this.ui.showNotification('Корзина успішно очищена!', 'success');
           await this.loadCart();
         } catch (error) {
           console.error('Error clearing cart:', error);
           this.ui.showNotification('Помилка при очищенні корзини', 'error');
+        }
+      }
+    );
+  }
+
+  async handlePlaceOrder() {
+    this.ui.showModal(
+      'Оформити замовлення',
+      'Ви впевнені, що хочете оформити замовлення?',
+      async () => {
+        try {
+          await this.api.placeOrder();
+          this.ui.closeModal();
+          this.ui.showNotification('Замовлення успішно оформлено!', 'success');
+          await this.loadCart();
+        } catch (error) {
+          console.error('Error placing order:', error);
+          this.ui.showNotification('Помилка при оформленні замовлення', 'error');
         }
       }
     );

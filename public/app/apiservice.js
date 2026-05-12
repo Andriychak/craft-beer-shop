@@ -1,6 +1,6 @@
 // ===== API Service Class =====
 class APIService {
-  constructor(baseURL = 'http://localhost:3000/api') {
+  constructor(baseURL = 'http://localhost:5300/api') {
     this.baseURL = baseURL;
   }
 
@@ -114,6 +114,10 @@ class APIService {
 
   async clearCart() {
     return this.request('/cart', 'DELETE');
+  }
+
+  async placeOrder() {
+    return this.request('/orders', 'POST');
   }
 }
 
