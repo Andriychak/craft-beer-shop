@@ -1,7 +1,6 @@
+const NO_IMAGE_URL = '../img/no-image.avif';
 // ===== UI Manager Class =====
 class UIManager {
-
-  noImageUrl = '../img/beer.webp';
 
   constructor() {
     this.currentPage = 'products';
@@ -22,7 +21,7 @@ class UIManager {
   }
 
   renderProductCard(product) {
-    const imageUrl = product.image || this.noImageUrl;
+    const imageUrl = product.image || NO_IMAGE_URL;
     const imageContent = imageUrl
       ? `<img src="${imageUrl}" alt="${product.name}">`
       : `<div class="product-image-placeholder">🍺</div>`;
@@ -77,7 +76,7 @@ class UIManager {
   }
 
   renderCartItem(cartItem) {
-    const imageUrl = cartItem.image || this.noImageUrl;
+    const imageUrl = cartItem.image || NO_IMAGE_URL;
     const imageContent = imageUrl
       ? `<img src="${imageUrl}" alt="${cartItem.name}">`
       : `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 2rem;">🍺</div>`;
@@ -157,7 +156,7 @@ class UIManager {
       document.getElementById('editAlcohol').value = product.alcohol || '';
       document.getElementById('editVolume').value = product.volume || '';
       document.getElementById('editCategory').value = product.category || 'Світле';
-      document.getElementById('editImageExisting').value = product.image || '';
+      document.getElementById('editImageExisting').value = product.image || NO_IMAGE_URL;
       document.getElementById('editDescription').value = product.description || '';
     }
   }

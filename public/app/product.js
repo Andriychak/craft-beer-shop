@@ -9,7 +9,7 @@ class Product {
     this.volume = data.volume || 500;
     this.brewery = data.brewery || '';
     this.category = data.category || 'Не зазначено';
-    this.image = data.image || '';
+    this.image = data.image || '../img/no-image.avif';
   }
 
   getPrice() {
