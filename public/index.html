@@ -11,10 +11,15 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="logo">🍺 Craft Beer Shop</div>
-      <ul class="nav-menu">
-        <li><a href="#" class="nav-link" onclick="showPage('products')">Каталог</a></li>
-        <li><a href="#" class="nav-link" onclick="showPage('create')">Додати товар</a></li>
-        <li><a href="#" class="nav-link cart-link" onclick="showPage('cart')">
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#" class="nav-link" onclick="showPage('products'); closeMobileMenu()">Каталог</a></li>
+        <li><a href="#" class="nav-link" onclick="showPage('create'); closeMobileMenu()">Додати товар</a></li>
+        <li><a href="#" class="nav-link cart-link" onclick="showPage('cart'); closeMobileMenu()">
           Корзина <span id="cartCount" class="cart-count">0</span>
         </a></li>
       </ul>

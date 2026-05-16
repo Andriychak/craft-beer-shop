@@ -41,6 +41,18 @@ class App {
       editForm.addEventListener('submit', (e) => this.handleEditProduct(e));
     }
 
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const navbar = document.querySelector('.navbar');
+      const hamburger = document.getElementById('hamburger');
+      const navMenu = document.getElementById('navMenu');
+      
+      if (navbar && hamburger && navMenu && !navbar.contains(e.target)) {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+      }
+    });
+
     // Cart and delete actions
     window.app = this;
   }
