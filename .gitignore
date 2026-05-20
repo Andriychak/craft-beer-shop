@@ -1,5 +1,5 @@
 node_modules/
-
+beer_shop.db
 .env
 .DS_Store
 *.log
