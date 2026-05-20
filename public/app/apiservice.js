@@ -1,6 +1,7 @@
+const API_BASE_URL = '/api';
 // ===== API Service Class =====
 class APIService {
-  constructor(baseURL = 'http://localhost:5300/api') {
+  constructor(baseURL = API_BASE_URL) {
     this.baseURL = baseURL;
   }
 

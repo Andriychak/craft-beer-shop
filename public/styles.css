@@ -149,7 +149,6 @@ body {
   background-color: var(--bg-secondary);
   border-bottom: 2px solid var(--border-color);
   flex-direction: column;
-  
   gap: 0;
   max-height: 0;
   overflow: hidden;

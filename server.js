@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 
 const app = express();
-const PORT = 5300;
+const SERVER_HOST = '0.0.0.0';
+const PORT = process.env.PORT || 5300;
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Middleware
@@ -560,6 +561,6 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, SERVER_HOST, () => {
+  console.log(`Server is running on http://${SERVER_HOST}:${PORT}`);
 });
